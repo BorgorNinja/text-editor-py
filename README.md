@@ -4,6 +4,7 @@ Introduction
 The Text Editor is a simple program written in Python that allows the user to create, edit, and save plain text files. The editor supports syntax highlighting for several programming languages and includes options for selecting fonts and word wrapping. The program also includes a menu and toolbar with options for opening, saving, and editing text.
 
 **Installation**
+
 To install the Text Editor, download the source code from the GitHub repository or use git to clone the repository:
 
 `git clone https://github.com/<username>/text-editor.git`
@@ -13,6 +14,7 @@ The program requires Python 3 and the tkinter module. To install tkinter on Ubun
 To install tkinter on Windows, tkinter is included with the standard Python distribution.
 
 **Usage**
+
 To run the Text Editor, navigate to the directory where the source code is located and run the text_editor.py file:
 
 `cd text-editor
