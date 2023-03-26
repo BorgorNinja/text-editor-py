@@ -7,7 +7,7 @@ The Text Editor is a simple program written in Python that allows the user to cr
 
 To install the Text Editor, download the source code from the GitHub repository or use git to clone the repository:
 
-`git clone https://github.com/<username>/text-editor.git`
+`git clone https://github.com/BorgorNinja/text-editor-py.git`
 The program requires Python 3 and the tkinter module. To install tkinter on Ubuntu, use the following command:
 
 `sudo apt-get install python3-tk`
@@ -17,8 +17,8 @@ To install tkinter on Windows, tkinter is included with the standard Python dist
 
 To run the Text Editor, navigate to the directory where the source code is located and run the text_editor.py file:
 
-`cd text-editor
-python text_editor.py`
+`cd text-editor-py
+python main.py`
 
 The Text Editor window will appear with a blank text area. To create a new file, simply start typing in the text area. To open an existing file, click on the "File" menu and select "Open". This will open a file dialog where you can select the file you want to open. The contents of the file will appear in the text area.
 
