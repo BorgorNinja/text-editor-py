@@ -1,5 +1,17 @@
 from tkinter import *
-from tkinter import filedialog, messagebox, simpledialog
+from tkinter import filedialog, messagebox, simpledialog, ttk
+from pygments import highlight
+from pygments.lexers import PythonLexer, JavascriptLexer, HtmlLexer, CssLexer
+from pygments.formatters import HtmlFormatter
+
+python_lexer = PythonLexer()
+javascript_lexer = JavascriptLexer()
+html_lexer = HtmlLexer()
+css_lexer = CssLexer()
+
+html_formatter = HtmlFormatter(style="colorful")
+
+
 
 def open_file(event=None):
     try:
@@ -7,18 +19,53 @@ def open_file(event=None):
         if file_path:
             with open(file_path, "r") as f:
                 text.delete(1.0, END)
-                text.insert(1.0, f.read())
+                file_content = f.read()
+                if file_path.endswith('.py'):
+                    lexer = python_lexer
+                elif file_path.endswith('.js'):
+                    lexer = javascript_lexer
+                elif file_path.endswith('.html'):
+                    lexer = html_lexer
+                elif file_path.endswith('.css'):
+                    lexer = css_lexer
+                else:
+                    return
+                highlighted_code = highlight(file_content, lexer, html_formatter)
+                t = Toplevel(root)
+                t.title(file_path)
+                t.geometry("800x600")
+                scrollbar = Scrollbar(t)
+                scrollbar.pack(side=RIGHT, fill=Y)
+                code_display = Text(t, wrap=WORD, yscrollcommand=scrollbar.set)
+                code_display.insert(END, highlighted_code)
+                code_display.pack(fill=BOTH, expand=True)
+                scrollbar.config(command=code_display.yview)
     except Exception as e:
         messagebox.showerror("Error", str(e))
 
+def view_html():
+    highlighted_code = highlight(text.get(1.0, END), python_lexer, html_formatter)
+    t = Toplevel(root)
+    t.title("HTML Preview")
+    t.geometry("800x600")
+    scrollbar = Scrollbar(t)
+    scrollbar.pack(side=RIGHT, fill=Y)
+    code_display = Text(t, wrap=WORD, yscrollcommand=scrollbar.set)
+    code_display.insert(END, highlighted_code)
+    code_display.pack(fill=BOTH, expand=True)
+    scrollbar.config(command=code_display.yview)
+
+
 def save_file(event=None):
     try:
-        file_path = filedialog.asksaveasfilename(defaultextension=".txt")
+        file_path = filedialog.asksaveasfilename(defaultextension=".html")
         if file_path:
             with open(file_path, "w") as f:
-                f.write(text.get(1.0, END))
+                highlighted_code = highlight(text.get(1.0, END), python_lexer, html_formatter)
+                f.write(highlighted_code)
     except Exception as e:
         messagebox.showerror("Error", str(e))
+
 
 def undo():
     try:
@@ -98,6 +145,17 @@ def word_count():
 def set_font(font_name):
     text.configure(font=(font_name, 12))
 
+def new_tab():
+    global text # Add this line to make text a global variable
+    tab = Frame(notebook)
+    text = Text(tab, wrap=WORD, font=("Courier New", 12))
+    text.pack(fill=BOTH, expand=1)
+    notebook.add(tab, text="New Tab")
+    notebook.select(tab)
+    # Give focus to the text widget
+    text.focus_set()
+
+
 def create_toolbar(parent):
     toolbar = Frame(parent, bd=1, relief=RIDGE)
     toolbar.pack(side=TOP, fill=X)
@@ -120,6 +178,13 @@ def create_toolbar(parent):
     font_var = StringVar(value="Courier New")
     font_menu = OptionMenu(toolbar, font_var, "Courier New", "Arial", "Times New Roman", command=set_font)
     font_menu.pack(side=RIGHT, padx=2, pady=2)
+
+    new_tab_button = Button(toolbar, text="New Tab", command=new_tab)
+    new_tab_button.pack(side=LEFT, padx=2, pady=2)
+
+    view_html_button = Button(toolbar, text="View HTML", command=view_html)
+    view_html_button.pack(side=LEFT, padx=2, pady=2)
+
 
     return toolbar
 
@@ -165,11 +230,13 @@ menu_bar.add_cascade(label="Tools", menu=tools_menu)
 create_menu_item(tools_menu, "Word Count", word_count)
 
 # Create a toolbar with buttons and font selection
-create_toolbar(root)
+toolbar = create_toolbar(root)
+text = None
+# Create a notebook widget with a new tab and a Text widget inside it
+notebook = ttk.Notebook(root)
+notebook.pack(fill=BOTH, expand=1)
 
-# Create a text editor with font selection and word wrapping
-text = Text(root, wrap=WORD, font=("Courier New", 12))
-text.pack(fill=BOTH, expand=1)
+new_tab()
 
 # Keybindings
 root.bind("<Control-s>", save_file)
@@ -183,8 +250,9 @@ root.bind("<Control-a>", select_all)
 root.bind("<Control-f>", find)
 root.bind("<Control-r>", replace)
 
-# Give focus to the text widget
-text.focus_set()
+
 
 # Run the main event loop
 root.mainloop()
+
+
